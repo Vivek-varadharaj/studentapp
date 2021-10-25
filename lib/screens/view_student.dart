@@ -1,10 +1,5 @@
-// import 'dart:io';
-
-// import 'dart:js';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:student_details_app/data_base_helper/data_base_helper.dart';
 import 'package:student_details_app/main.dart';
 import 'package:student_details_app/models/student_model.dart';
 import 'package:student_details_app/screens/edit_student.dart';
@@ -20,6 +15,7 @@ class ViewStudent extends StatefulWidget {
   String rollNumber;
   String status;
   String studentClass;
+  String image;
   ViewStudent({
     required this.studentModel,
     required this.editIt,
@@ -29,13 +25,13 @@ class ViewStudent extends StatefulWidget {
     required this.rollNumber,
     required this.marks,
     required this.studentClass,
+    required this.image,
   });
   @override
   State<ViewStudent> createState() => _ViewStudentState();
 }
 
 class _ViewStudentState extends State<ViewStudent> {
-  
   changeIt(selectedValue) {
     setState(() {
       widget.status = selectedValue;
@@ -43,10 +39,7 @@ class _ViewStudentState extends State<ViewStudent> {
     print(widget.status);
   }
 
-  // final ImagePicker _picker = new ImagePicker();
-  var image =
-      "https://vivek-varadharaj.github.io/Vivek-Varadharaj/img/vivek3.jpg";
- 
+
 
   StudentModel? newStudent;
 
@@ -87,17 +80,19 @@ class _ViewStudentState extends State<ViewStudent> {
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      Center(
-                        child: InkWell(
-                          child: CircleAvatar(
-                            // backgroundImage: FileImage(File(image)),
-
-                            radius: 60,
+                      InkWell(
+                        child: Container(
+                          clipBehavior: Clip.hardEdge,
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
                           ),
-                          onTap: () {
-                            // takePhoto(ImageSource.camera);
-                          },
+                          child: studentImageGet(widget.image),
                         ),
+                        onTap: () {
+                          // takePhoto(ImageSource.camera);
+                        },
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
@@ -105,11 +100,11 @@ class _ViewStudentState extends State<ViewStudent> {
                         child: TextFormField(
                           enabled: false,
                           validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Required field";
-                              }
-                              return null;
-                            },
+                            if (value == null || value.isEmpty) {
+                              return "Required field";
+                            }
+                            return null;
+                          },
                           initialValue: widget.rollNumber,
                           // controller: nameController,
                           keyboardType: TextInputType.name,
@@ -138,11 +133,11 @@ class _ViewStudentState extends State<ViewStudent> {
                         child: TextFormField(
                           enabled: false,
                           validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Required field";
-                              }
-                              return null;
-                            },
+                            if (value == null || value.isEmpty) {
+                              return "Required field";
+                            }
+                            return null;
+                          },
                           initialValue: widget.name,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
@@ -170,11 +165,11 @@ class _ViewStudentState extends State<ViewStudent> {
                         child: TextFormField(
                           enabled: false,
                           validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Required field";
-                              }
-                              return null;
-                            },
+                            if (value == null || value.isEmpty) {
+                              return "Required field";
+                            }
+                            return null;
+                          },
                           initialValue: widget.studentClass,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
@@ -202,11 +197,11 @@ class _ViewStudentState extends State<ViewStudent> {
                         child: TextFormField(
                           enabled: false,
                           validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Required field";
-                              }
-                              return null;
-                            },
+                            if (value == null || value.isEmpty) {
+                              return "Required field";
+                            }
+                            return null;
+                          },
                           initialValue: widget.marks,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
@@ -230,9 +225,11 @@ class _ViewStudentState extends State<ViewStudent> {
                       ),
                       DropDown(widget.status, changeIt),
                       ElevatedButton(
-                        onPressed: (){
-                          
-                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditStudent(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditStudent(//Navigating to edit student upon request
                                         editIt: widget.editIt,
                                         studentModel: widget.studentModel,
                                         id: widget.id,
@@ -241,6 +238,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                         rollNumber: widget.rollNumber,
                                         status: widget.status,
                                         studentClass: widget.studentClass,
+                                        image: widget.image,
                                       )));
                         },
                         child: Text("Edit"),
@@ -256,13 +254,17 @@ class _ViewStudentState extends State<ViewStudent> {
     );
   }
 
-  // takePhoto(source) async {
-  //   final images = (await _picker.pickImage(
-  //     source: source,
-  //   ));
-
-  //   setState(() {
-  //     image = images!.path;
-  //   });
-  // }
+ Widget studentImageGet(base64String) {//function for converting the base64 string back into uint8List and image.memory displays it.
+    if (base64String != null && base64String!=""){
+      return Image.memory(base64Decode(base64String),
+      fit: BoxFit.cover,);
+    }
+    return Container(
+      height: 100,
+      width: 100,
+      color: Colors.blue,
+      child:Image(image: AssetImage("assets/user.png"),
+      fit: BoxFit.fitHeight,)
+    );
+  }
 }

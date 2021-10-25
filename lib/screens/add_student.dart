@@ -1,6 +1,9 @@
-// import 'dart:io';
+import 'dart:io';
 
 // import 'package:flutter/foundation.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:student_details_app/data_base_helper/data_base_helper.dart';
@@ -10,9 +13,9 @@ import 'package:student_details_app/models/student_model.dart';
 import 'package:student_details_app/widgets/dropdown_button.dart';
 
 class AddStudent extends StatefulWidget {
-  var studentModel;
+  // final studentModel;
   Function letState;
-  AddStudent(this.studentModel, this.letState);
+  AddStudent(this.letState);
   @override
   State<AddStudent> createState() => _AddStudentState();
 }
@@ -20,16 +23,14 @@ class AddStudent extends StatefulWidget {
 class _AddStudentState extends State<AddStudent> {
   final _formKey = GlobalKey<FormState>();
   String? currentItemSelected;
+
   changeIt(selectedValue) {
+    //function for changing the dropdowm value
     setState(() {
       this.currentItemSelected = selectedValue;
     });
-    print(currentItemSelected);
   }
 
-  final ImagePicker _picker = new ImagePicker();
-  var image =
-      "https://vivek-varadharaj.github.io/Vivek-Varadharaj/img/vivek3.jpg";
   String? rollNumber;
   String? name;
   String? studentClass;
@@ -38,19 +39,22 @@ class _AddStudentState extends State<AddStudent> {
 
   StudentModel? newStudent;
 
+//function for creating a new student and adding it to the database
   void addNewStudent(String newId, String newName, String newClass,
-      String newStatus, String newMarks) {
+      String newStatus, String newMarks, String base64Image) {
+    // print("add checking $base64Image");
     newStudent = StudentModel(
       rollNumber: newId,
       name: newName,
       standard: newClass,
       status: newStatus,
       marks: newMarks,
+      image: base64Image,
     );
-    widget.letState(newStudent, context);
+    widget.letState(newStudent,
+        context); //calling a function in mainscreen for to set its state as well as tha function inserts student
+    //  print("checking $base64Image");
   }
-
-  TextEditingController nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,44 +66,51 @@ class _AddStudentState extends State<AddStudent> {
         color: Colors.black,
         child: Form(
           key: _formKey,
-          
           child: ListView(children: [
             Center(
               child: Container(
-                // height: MediaQuery.of(context).size.height,
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                 child: Card(
                   elevation: 10,
-                  // color: Colors.lightBlue,
                   shadowColor: Color(MyApp.royalBlue),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Center(
-                          child: InkWell(
-                            child: CircleAvatar(
-                              // backgroundImage: FileImage(File(image)),
-
-                              radius: 60,
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50)),
+                          clipBehavior: Clip.hardEdge,
+                          height: 100,
+                          width: 100,
+                          child: Center(
+                            child: InkWell(
+                              child: Container(
+                                  width: 100,
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: imageLoad()),
+                              onTap: () {
+                                takePhoto(ImageSource.gallery);
+                              },
                             ),
-                            onTap: () {
-                              takePhoto(ImageSource.camera);
-                            },
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, top: 5, bottom: 5),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Required field";
                               }
                               return null;
                             },
-                            keyboardType: TextInputType.name,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               prefixIcon: Icon(Icons.card_membership),
                               focusedBorder: OutlineInputBorder(
@@ -123,7 +134,8 @@ class _AddStudentState extends State<AddStudent> {
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, top: 5, bottom: 5),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Required field";
@@ -154,14 +166,15 @@ class _AddStudentState extends State<AddStudent> {
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, top: 5, bottom: 5),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Required field";
                               }
                               return null;
                             },
-                            keyboardType: TextInputType.name,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               prefixIcon: Icon(Icons.school),
                               focusedBorder: OutlineInputBorder(
@@ -185,14 +198,15 @@ class _AddStudentState extends State<AddStudent> {
                           padding: const EdgeInsets.only(
                               left: 20, right: 20, top: 5, bottom: 5),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return "Required field";
                               }
                               return null;
                             },
-                            keyboardType: TextInputType.name,
+                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               prefixIcon: Icon(Icons.card_membership),
                               focusedBorder: OutlineInputBorder(
@@ -212,12 +226,18 @@ class _AddStudentState extends State<AddStudent> {
                             },
                           ),
                         ),
-                        DropDown(currentItemSelected, changeIt),
+                        DropDown(currentItemSelected,
+                            changeIt), //dropdown button coded in another page and currentItemSelected is used to set the value of the button on refreshing
                         ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              addNewStudent(rollNumber!, name!, studentClass!,
-                                  currentItemSelected!, marks!);
+                              addNewStudent(
+                                  rollNumber!,
+                                  name!,
+                                  studentClass!,
+                                  currentItemSelected!,
+                                  marks!,
+                                  base64Image!); // calls a function to create student object with given data
                             }
                           },
                           child: Text("Add Student"),
@@ -234,13 +254,45 @@ class _AddStudentState extends State<AddStudent> {
     );
   }
 
-  takePhoto(source) async {
-    final images = (await _picker.pickImage(
+
+/*Functions for converting Xfile into base64String*/
+
+  var path;
+  final ImagePicker _picker = new ImagePicker();
+  XFile? images;
+  var imageBytes;
+  String? base64Image= "";
+
+  takePhoto(source) async {//function that picks the photo from storage and converts to base64
+    images = await _picker.pickImage(
       source: source,
-    ));
+    );
+
+    if (images != null ) {
+      Uint8List imageBytes = await images!.readAsBytes();
+      base64Image = base64Encode(imageBytes);
+    }
 
     setState(() {
-      image = images!.path;
+      if (images != null) {//it is used to load an image from path temperorly for user experience
+        path = images!.path;
+      }
     });
+  }
+
+  Widget imageLoad() {//loading image from path
+    if (path != null) {
+      return Image.file(
+        File(path),
+        fit: BoxFit.cover,
+      );
+    } else
+       return Container(
+      height: 100,
+      width: 100,
+      color: Colors.blue,
+      child:Image(image: AssetImage("assets/user.png"),
+      fit: BoxFit.fitHeight,)
+    );
   }
 }

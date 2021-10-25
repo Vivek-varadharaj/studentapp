@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class DropDown extends StatelessWidget {
   final currentItemSelected;
-  final changeIt;
-  DropDown(this.currentItemSelected, this.changeIt);
+  Function changeIt;
+  DropDown(this.currentItemSelected, this.changeIt);//function and data passed from the addstudent class
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class DropDown extends StatelessWidget {
                   )
                 ],
                 onChanged: (value) {
-                  changeIt(value);
+                  changeIt(value);//calls a function in add student class to set the state
                 },
                 hint: Text(
                   "Status",

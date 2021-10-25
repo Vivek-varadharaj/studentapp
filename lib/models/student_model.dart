@@ -5,6 +5,7 @@ class StudentModel {
   final String? marks;
   final String? standard;
   final String? rollNumber;
+  final String? image;
 
   StudentModel({
     this.id,
@@ -13,6 +14,7 @@ class StudentModel {
      this.marks,
      this.standard,
      this.rollNumber,
+     this.image,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +24,8 @@ class StudentModel {
       'name': name,
       'status': status,
       'marks': marks,
-      'standard': standard
+      'standard': standard,
+      'image' :image,
     };
   }
 }
